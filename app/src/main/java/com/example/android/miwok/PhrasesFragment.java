@@ -5,14 +5,20 @@ import android.content.Context;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.os.Bundle;
-import android.support.v7.app.AppCompatActivity;
+import android.support.v4.app.Fragment;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ListView;
+import android.widget.TextView;
 
 import java.util.ArrayList;
 
-public class ColorsActivity extends AppCompatActivity {
+/**
+ * A simple {@link Fragment} subclass.
+ */
+public class PhrasesFragment extends Fragment {
 
     /**
      * Handles media playback of all audio files
@@ -75,31 +81,49 @@ public class ColorsActivity extends AppCompatActivity {
         }
     };
 
+    public PhrasesFragment() {
+        // Required empty public constructor
+    }
+
+
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.word_list);
+    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+                             Bundle savedInstanceState) {
+
+        View rootView = inflater.inflate(R.layout.word_list, container, false);
 
         // set up and create Audio Manager to request audio focus
-        mAudioManager = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
+        mAudioManager = (AudioManager) getActivity().getSystemService(Context.AUDIO_SERVICE);
 
         // Create custom ArrayList to store translations of the word
         final ArrayList<Word> words = new ArrayList<>();
-        words.add(new Word("red", "weṭeṭṭi", R.drawable.color_red, R.raw.color_red));
-        words.add(new Word("green", "chokokki", R.drawable.color_green, R.raw.color_green));
-        words.add(new Word("brown", "ṭakaakki", R.drawable.color_brown, R.raw.color_brown));
-        words.add(new Word("gray", "ṭopoppi", R.drawable.color_gray, R.raw.color_gray));
-        words.add(new Word("black", "kululli", R.drawable.color_black, R.raw.color_black));
-        words.add(new Word("white", "kelelli", R.drawable.color_white, R.raw.color_white));
-        words.add(new Word("dusty yellow", "ṭopiisә", R.drawable.color_dusty_yellow, R.raw.color_dusty_yellow));
-        words.add(new Word("mustard yellow", "chiwiiṭә", R.drawable.color_mustard_yellow, R.raw.color_mustard_yellow));
+        words.add(new Word("Where are you going?", "minto wuksus",
+                R.raw.phrase_where_are_you_going));
+        words.add(new Word("What is your name?", "tinnә oyaase'nә",
+                R.raw.phrase_what_is_your_name));
+        words.add(new Word("My name is..", "oyaaset...",
+                R.raw.phrase_my_name_is));
+        words.add(new Word("How are you feeling?", "michәksәs?",
+                R.raw.phrase_how_are_you_feeling));
+        words.add(new Word("I’m feeling good.", "kuchi achit",
+                R.raw.phrase_im_feeling_good));
+        words.add(new Word("Are you coming?", "әәnәs'aa?",
+                R.raw.phrase_are_you_coming));
+        words.add(new Word("Yes, I’m coming.", "hәә’ әәnәm",
+                R.raw.phrase_yes_im_coming));
+        words.add(new Word("I’m coming.", "әәnәm",
+                R.raw.phrase_im_coming));
+        words.add(new Word("Let’s go.", "yoowutis",
+                R.raw.phrase_lets_go));
+        words.add(new Word("Come here.", "әnni'nem",
+                R.raw.phrase_come_here));
 
         // ArrayAdapter inflating custom list
         WordAdapter adapter =
-                new WordAdapter(this, words, R.color.category_colors);
+                new WordAdapter(getActivity(), words, R.color.category_phrases);
 
         // List view
-        ListView listView = findViewById(R.id.list);
+        ListView listView = rootView.findViewById(R.id.list);
 
         // Put adapter onto list view object
         listView.setAdapter(adapter);
@@ -116,8 +140,9 @@ public class ColorsActivity extends AppCompatActivity {
                 // create word object and get its position
                 Word word = words.get(position);
 
-                // Request audio focus so in order to play the audio file. The app needs to play a
-                // short audio file, so we will request audio focus with a short amount of time
+                // Request audio focus so in order to play the audio file.
+                // The app needs to play a short audio file,
+                // so we will request audio focus with a short amount of time
                 // with AUDIOFOCUS_GAIN_TRANSIENT
                 int result = mAudioManager.requestAudioFocus(mOnAudioFocusChangeListener,
                         AudioManager.STREAM_MUSIC, AudioManager.AUDIOFOCUS_GAIN_TRANSIENT);
@@ -127,30 +152,26 @@ public class ColorsActivity extends AppCompatActivity {
 
                     // create media player object and associate it to the
                     // relevant word object
-                    mMediaPlayer = MediaPlayer.create(ColorsActivity.this, word.getAudioResourceId());
+                    mMediaPlayer = MediaPlayer.create(getActivity(),
+                            word.getAudioResourceId());
 
                     // start audio file
                     mMediaPlayer.start();
 
-                    // Setup a listener on the media player, so that we can stop and release the
+                    // Setup a listener on the media player,
+                    // so that we can stop and release the
                     // media player once the sound has finished playing.
                     mMediaPlayer.setOnCompletionListener(mCompleteListener);
                 }
-
-                // set up listener on media player, so we can stop
-                // and release media resources
-                mMediaPlayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
-                    @Override
-                    public void onCompletion(MediaPlayer mp) {
-                        releaseMediaPlayer();
-                    }
-                });
             }
         });
+
+        return rootView;
     }
 
+
     @Override
-    protected void onStop() {
+    public void onStop() {
         super.onStop();
 
         // when the activity is stopped, release the media player resources
@@ -178,4 +199,5 @@ public class ColorsActivity extends AppCompatActivity {
             mAudioManager.abandonAudioFocus(mOnAudioFocusChangeListener);
         }
     }
+
 }
